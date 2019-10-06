@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ShowImage</string>
+    <string name="map_api">AIzaSyANTFlMvEepTYsJEHDRo35dFfwsRM9ZBrc</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="delete_dialog">Are you sure to delete marker?</string>
+    <string name="button_dialog_ok">OK</string>
+    <string name="button_dialog_cancel">Cancel</string>
+    <string name="font_family">Roboto</string>
+    <string name="zoom_in">+</string>
+    <string name="zoom_out">-</string>
+</resources>
