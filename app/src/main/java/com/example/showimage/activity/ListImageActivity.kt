@@ -1,20 +1,14 @@
-package com.example.showimage
+package com.example.showimage.activity
 
-import android.app.AlertDialog
-import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.widget.Button
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
+import com.example.showimage.R
+import com.example.showimage.Utils
 import com.example.showimage.adapter.CollectionAdapter
 import com.example.showimage.database.model.Image
 import com.example.showimage.viewmodel.ImageViewModel
-import com.google.android.gms.maps.model.Marker
 import kotlinx.android.synthetic.main.activity_list_image.*
-import java.io.InputStream
-import java.net.URL
 import kotlin.collections.ArrayList
 
 

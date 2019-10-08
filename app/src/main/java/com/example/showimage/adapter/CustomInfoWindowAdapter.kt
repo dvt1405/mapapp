@@ -9,13 +9,13 @@ import com.google.android.gms.maps.model.Marker
 class CustomInfoWindowAdapter(private val customView:View):GoogleMap.InfoWindowAdapter {
     override fun getInfoContents(p0: Marker?): View {
         var textView:TextView = customView.findViewById(R.id.textViewInfoWindow)
-        textView.setText(p0?.title)
+        textView.text = p0?.title
         return customView
     }
 
     override fun getInfoWindow(p0: Marker?): View {
         var textView:TextView = customView.findViewById(R.id.textViewInfoWindow)
-        textView.setText(p0?.title)
+        textView.text = p0?.title
         return customView
     }
 }

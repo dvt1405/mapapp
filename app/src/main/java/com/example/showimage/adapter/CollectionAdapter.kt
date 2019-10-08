@@ -25,11 +25,6 @@ class CollectionAdapter(
     private var page: Int
 ) : BaseAdapter() {
 
-    var contextAdapter: Context
-        get() = this.context
-        set(value) {
-            this.context = value
-        }
     var listImage
         get() = listImageData
         set(value) {
@@ -57,16 +52,16 @@ class CollectionAdapter(
         }
         if (this.listImageData.isNotEmpty()) {
             Log.i("size", listImageData.size.toString())
-            try{
+            try {
                 val items = this.listImageData.get(position)
-                viewHolder.textView!!.setText(items.title)
+                viewHolder.textView!!.text = items.title
                 if (items.bitmap != null) {
                     Log.i("bitmap", "load done")
                     loadImageBitmap(items.bitmap!!, viewHolder.imageView!!)
                 } else if (items.url!!.isNotEmpty()) {
                     loadImageNetwork(items.url.toString(), viewHolder.imageView!!)
                 }
-            }catch (err:Exception) {
+            } catch (err: Exception) {
                 err.printStackTrace()
             }
         } else {
