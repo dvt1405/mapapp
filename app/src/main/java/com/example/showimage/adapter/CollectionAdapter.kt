@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.example.showimage.R
 import com.example.showimage.database.model.Image
 import java.io.ByteArrayInputStream
+import java.lang.Exception
 
 
 class CollectionAdapter(
@@ -42,8 +43,8 @@ class CollectionAdapter(
         }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view: View
-        val viewHolder: ViewHolder
+        var view: View
+        var viewHolder: ViewHolder
         if (convertView == null) {
             val inflater =
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -54,15 +55,19 @@ class CollectionAdapter(
             view = convertView
             viewHolder = view.tag as ViewHolder
         }
-
-        if (this.listImage.size > 0) {
-            val items = this.listImage.get(position)
-            viewHolder.textView!!.setText(items.title)
-            if (items.bitmap != null) {
-                Log.i("bitmap", "load done")
-                loadImageBitmap(items.bitmap!!, viewHolder.imageView!!)
-            } else if (items.url!!.length > 0) {
-                loadImageNetwork(items.url.toString(), viewHolder.imageView!!)
+        if (this.listImageData.isNotEmpty()) {
+            Log.i("size", listImageData.size.toString())
+            try{
+                val items = this.listImageData.get(position)
+                viewHolder.textView!!.setText(items.title)
+                if (items.bitmap != null) {
+                    Log.i("bitmap", "load done")
+                    loadImageBitmap(items.bitmap!!, viewHolder.imageView!!)
+                } else if (items.url!!.isNotEmpty()) {
+                    loadImageNetwork(items.url.toString(), viewHolder.imageView!!)
+                }
+            }catch (err:Exception) {
+                err.printStackTrace()
             }
         } else {
             Toast.makeText(context, "No image to show", Toast.LENGTH_LONG).show()

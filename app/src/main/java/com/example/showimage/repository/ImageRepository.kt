@@ -56,7 +56,7 @@ class ImageRepository(
 
     suspend fun updateImage(image: Image) = imageDAO.updateImage(image)
 
-    fun getImagesNetwork(
+    fun loadImagesNetwork(
         lat: Double,
         lon: Double,
         page: Int,
@@ -97,8 +97,6 @@ class ImageRepository(
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
             }
         })
-
-
         return image
     }
 
@@ -118,7 +116,7 @@ class ImageRepository(
                     it.bitmap = byteArrayImage
                     runBlocking {
                         updateImage(it)
-                        Log.i("utl", it.url)
+                        Log.i("url", it.url.plus(" "+it.id))
                     }
                     Log.i("Download", "Done")
                 }
@@ -139,5 +137,6 @@ class ImageRepository(
         }
         return images
     }
+
 
 }

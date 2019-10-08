@@ -148,6 +148,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
                 )
             ).title("My location")
         )
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(p0.latitude,p0.longitude)))
+        this.markerViewModel.insertMarkerOption(MarkerOptions().position(LatLng(p0.latitude,p0.longitude)))
     }
 
     override fun onMarkerClick(p0: Marker): Boolean {

@@ -16,10 +16,10 @@ interface MarkerDAO {
     @Query("SELECT * FROM MARKER")
     suspend fun selectAllMarker(): List<MarkerDBModel>
 
-    @Insert()
+    @Insert
     suspend fun insertlistMarker(markers: List<MarkerDBModel>)
 
-    @Insert()
+    @Insert
     suspend fun insertMarker(markerDBModel: MarkerDBModel)
 
     @Update

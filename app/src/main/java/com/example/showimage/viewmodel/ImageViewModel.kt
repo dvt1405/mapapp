@@ -22,12 +22,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import retrofit2.http.Url
 import java.io.ByteArrayOutputStream
+import java.lang.NullPointerException
 import java.net.URL
+import java.util.*
 import java.util.function.LongFunction
 
 class ImageViewModel(application: Application) : AndroidViewModel(application) {
     var imageRepository: ImageRepository
-    var imageMarerRepository: ImageMarkerRepository
+    var imageMarkerRepository: ImageMarkerRepository
     var markerRepository: MarkerRepository
     var listImage: MutableLiveData<List<Image>>? = MutableLiveData()
 
@@ -36,7 +38,7 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         val imageDao = roomDB.imageDAO()
         val imageMarkerDAO = roomDB.ImageMarkerDAO()
         val markerDAO = roomDB.MarkerDAO()
-        imageMarerRepository = ImageMarkerRepository(imageMarkerDAO)
+        imageMarkerRepository = ImageMarkerRepository(imageMarkerDAO)
         imageRepository =
             ImageRepository(imageDao, imageMarkerDAO = imageMarkerDAO, markerDAO = markerDAO)
         markerRepository = MarkerRepository(markerDAO)
@@ -48,18 +50,28 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun insert(images: List<Image>, lat: Double, lon: Double) = viewModelScope.launch {
-        Log.i("Size insert", images.size.toString())
-        val imageMarkerModel = ImageMarkerModel()
-        val marker: MarkerDBModel = markerRepository.getMarker(lat, lon)
-        imageMarkerModel.id_marker = marker.id
-        Log.i("ID marker", marker.id)
         for (items in images) {
             Log.i("ID image", items.id)
-            imageMarkerModel.id_image = items.id
-            imageMarerRepository.insert(imageMarkerModel)
-            Log.i("Insert", "done")
+            var imageMarkerModel = imageMarkerRepository.getImageMarker(items)
+            try {
+                var marker: MarkerDBModel = async { markerRepository.getMarker(lat, lon) }.await()
+                imageMarkerModel.id_marker = marker.id
+                imageMarkerModel.id_image = items.id
+                imageMarkerRepository.update(imageMarkerModel)
+                imageRepository.insertImage(items)
+                Log.i("Insert", "done")
+            }catch (ex:NullPointerException) {
+                imageMarkerModel = ImageMarkerModel()
+                var marker: MarkerDBModel = async { markerRepository.getMarker(lat, lon) }.await()
+                imageMarkerModel.id = UUID.randomUUID().toString()
+                imageMarkerModel.id_marker = marker.id
+                imageMarkerModel.id_image = items.id
+                imageMarkerRepository.insert(imageMarkerModel)
+                imageRepository.insertImage(items)
+                Log.i("Insert", "done")
+            }
+
         }
-        imageRepository.insertImage(images)
     }
 
 
@@ -81,7 +93,7 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         var data: MutableLiveData<List<Image>> = MutableLiveData()
 
         runBlocking {
-            val liveData = async { imageRepository.getImagesNetwork(lat, lon, page, perpage) }
+            val liveData = async { imageRepository.loadImagesNetwork(lat, lon, page, perpage) }
             runBlocking {
                 data = liveData.await() as MutableLiveData<List<Image>>
             }
@@ -95,7 +107,7 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         var data: List<Image> = listOf()
         runBlocking {
             val marker: MarkerDBModel = markerRepository.getMarker(lat, lon)
-            val listImageMarker = imageMarerRepository.getListImageMarkerByIDMarker(marker)
+            val listImageMarker = imageMarkerRepository.getListImageMarkerByIDMarker(marker)
             val images = async { imageRepository.loadImageLocal(listImageMarker) }
             runBlocking {
                 data = images.await()
@@ -112,6 +124,11 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
 
     fun downloadListImage(images: List<Image>) {
         imageRepository.downloadImage(images)
+    }
+
+    fun delete(image: Image) = viewModelScope.launch {
+        imageRepository.deleteImage(image)
+        imageMarkerRepository.delete(image)
     }
 
 }
