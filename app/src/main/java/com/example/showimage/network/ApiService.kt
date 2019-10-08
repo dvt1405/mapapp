@@ -4,10 +4,13 @@ import com.example.showimage.Utils
 import com.example.showimage.database.model.ListImageResponse
 import io.reactivex.Observable
 import okhttp3.Response
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface ApiService {
     @GET("rest")
@@ -31,6 +34,8 @@ interface ApiService {
         @Query("per_page") perpage:String
     ): Observable<ListImageResponse>
 
+    @GET
+    fun downloadImage(@Url url:String):Call<ResponseBody>
     companion object Factory {
         fun create(): ApiService {
             val retrofit = retrofit2.Retrofit.Builder()

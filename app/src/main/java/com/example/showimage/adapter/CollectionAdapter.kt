@@ -1,44 +1,73 @@
 package com.example.showimage.adapter
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.showimage.R
 import com.example.showimage.database.model.Image
+import java.io.ByteArrayInputStream
+
 
 class CollectionAdapter(
     private var context: Context,
-    private var listImageData: List<Image>?
+    private var listImageData: ArrayList<Image> = arrayListOf(),
+    private var page: Int
 ) : BaseAdapter() {
-    public var contextAdapter: Context
+
+    var contextAdapter: Context
         get() = this.context
         set(value) {
             this.context = value
         }
-    public var listImage
-        get() = listImageData as ArrayList<Image>
+    var listImage
+        get() = listImageData
         set(value) {
-            this.listImageData = value
+            this.listImageData.addAll(value)
             notifyDataSetChanged()
+        }
+    var pageNume
+        get() = page
+        set(value) {
+            page = value
         }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        var viewLayoutItem = inflater.inflate(R.layout.grid_item_layout, null)
-        var items = this.listImage.get(position)
-        var imgItem:ImageView = viewLayoutItem.findViewById(R.id.imageItem)
-        var titleImage: TextView = viewLayoutItem.findViewById(R.id.titleImage)
-        var url = "https://farm${items.farm}.staticflickr.com/${items.server}/${items.id}_${items.secret}.jpg"
-        Glide.with(context).load(url).into(imgItem)
-//        var url2 = "https://live.staticflickr.com/${items.server}/${items.id}_${items.secret}.jpg"
-//        Glide.with(context).load(url2).into(imgItem)
-        titleImage.setText(items.title)
-        return viewLayoutItem
+        val view: View
+        val viewHolder: ViewHolder
+        if (convertView == null) {
+            val inflater =
+                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            view = inflater.inflate(R.layout.grid_item_layout, null)
+            viewHolder = ViewHolder((view))
+            view.tag = viewHolder
+        } else {
+            view = convertView
+            viewHolder = view.tag as ViewHolder
+        }
+
+        if (this.listImage.size > 0) {
+            val items = this.listImage.get(position)
+            viewHolder.textView!!.setText(items.title)
+            if (items.bitmap != null) {
+                Log.i("bitmap", "load done")
+                loadImageBitmap(items.bitmap!!, viewHolder.imageView!!)
+            } else if (items.url!!.length > 0) {
+                loadImageNetwork(items.url.toString(), viewHolder.imageView!!)
+            }
+        } else {
+            Toast.makeText(context, "No image to show", Toast.LENGTH_LONG).show()
+        }
+        return view
     }
 
     override fun getItem(position: Int): Any = this.listImageData!!.get(position)
@@ -46,16 +75,24 @@ class CollectionAdapter(
     override fun getItemId(position: Int): Long = this.listImageData!!.get(position).id!!.toLong()
 
     override fun getCount(): Int = this.listImageData!!.size
-
-    class CollectionViewHodler(
-        var imageView: ImageView,
-        var textView: TextView
-    ) {
-        public var imageViewHolder: ImageView
-            get() = this.imageView
-            set(value) {
-                imageView = value
-            }
-
+    fun loadImageBitmap(arr: ByteArray, view: ImageView) {
+        val arrayInputStream = ByteArrayInputStream(arr)
+        val bitmap = BitmapFactory.decodeStream(arrayInputStream)
+        Glide.with(context).load(bitmap).into(view)
     }
+
+    fun loadImageNetwork(url: String, imgItem: ImageView) {
+        Glide.with(context).load(url).into(imgItem)
+    }
+
+    class ViewHolder(row: View?) {
+        var imageView: ImageView? = null
+        var textView: TextView? = null
+
+        init {
+            imageView = row?.findViewById(R.id.imageItem)
+            textView = row?.findViewById(R.id.titleImage)
+        }
+    }
+
 }

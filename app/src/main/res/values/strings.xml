@@ -8,4 +8,5 @@
     <string name="font_family">Roboto</string>
     <string name="zoom_in">+</string>
     <string name="zoom_out">-</string>
+    <string name="btn_load_more">Load more</string>
 </resources>

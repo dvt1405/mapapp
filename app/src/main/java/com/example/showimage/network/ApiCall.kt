@@ -36,6 +36,6 @@ class ApiCall {
         lon,
         perpage
     )
-
+    fun downloadImage(url:String):Call<ResponseBody> = apiService.downloadImage(url)
 
 }

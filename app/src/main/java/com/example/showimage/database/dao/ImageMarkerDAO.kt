@@ -7,7 +7,7 @@ import com.example.showimage.database.model.ImageMarkerModel
 @Dao
 interface ImageMarkerDAO {
     @Query("SELECT * FROM image_marker WHERE idmarker = :id")
-    suspend fun getImageOfMarker(id: Int): ImageMarkerModel
+    suspend fun getImageOfMarker(id: String): List<ImageMarkerModel>
 
     @Update
     suspend fun updateImageMarker(imageMarkerModel: ImageMarkerModel)

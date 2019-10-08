@@ -10,11 +10,17 @@ import java.util.*
 class MarkerDBModel {
     @PrimaryKey
     @NonNull
-    var id:String?= UUID.randomUUID().toString()
+    var id: String? = UUID.randomUUID().toString()
     @ColumnInfo(name = "latitude")
-    var lat:String?=""
+    var lat: String? = ""
     @ColumnInfo(name = "longitude")
-    var lon:String?=""
+    var lon: String? = ""
     @ColumnInfo(name = "member")
-    var isOldMarker:Boolean?=false
+    var isOldMarker: Boolean? = false
+    @ColumnInfo(name = "title")
+    var title: String? = ""
+    @ColumnInfo(name = "city")
+    var city: String? = ""
+    @ColumnInfo(name = "country")
+    var country: String? = ""
 }

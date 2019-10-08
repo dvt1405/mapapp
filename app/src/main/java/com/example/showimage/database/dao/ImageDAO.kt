@@ -3,28 +3,27 @@ package com.example.showimage.database.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.showimage.database.model.Image
-import com.example.showimage.database.model.ImageDBModel
 
 @Dao
 interface ImageDAO {
     @Query("SELECT * FROM IMAGE WHERE id = :id")
-    suspend fun getImage(id: Int): ImageDBModel
+    suspend fun getImage(id: String): Image
 
     @Query("SELECT * FROM IMAGE")
-    suspend fun getImage(): List<ImageDBModel>
+    suspend fun getImage(): List<Image>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserImage(image: ImageDBModel)
+    suspend fun inserImage(image: Image)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserImage(imageList: List<ImageDBModel>)
+    suspend fun inserImage(imageList: List<Image>)
 
     @Update
-    suspend fun updateImage(image: ImageDBModel)
+    suspend fun updateImage(image: Image)
 
     @Delete
-    suspend fun deleteImage(image: ImageDBModel)
+    suspend fun deleteImage(image: Image)
 
     @Delete
-    suspend fun deleteImage(images: List<ImageDBModel>)
+    suspend fun deleteImage(images: List<Image>)
 }

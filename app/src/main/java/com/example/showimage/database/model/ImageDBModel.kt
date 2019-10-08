@@ -1,12 +1,13 @@
 package com.example.showimage.database.model
 
+import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "image")
 class ImageDBModel {
     @PrimaryKey
+    @NonNull
     var id:Long=0
     @ColumnInfo(name = "title")
     var title:String?=""

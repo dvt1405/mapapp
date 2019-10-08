@@ -1,16 +1,19 @@
 package com.example.showimage.database.model
 
+import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.*
 
 @Entity(tableName = "image_marker")
 class ImageMarkerModel {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = 0
+    @PrimaryKey
+    @NonNull
+    var id: String? = UUID.randomUUID().toString()
     @ColumnInfo(name = "idmarker")
-    var id_marker: Int? = 0
+    var id_marker: String? = ""
     @ColumnInfo(name = "idimage")
-    var id_image: Int? = 0
+    var id_image: String? = ""
 
 }

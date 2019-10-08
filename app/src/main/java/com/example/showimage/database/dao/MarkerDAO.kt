@@ -2,7 +2,6 @@ package com.example.showimage.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.showimage.database.model.ImageDBModel
 import com.example.showimage.database.model.MarkerDBModel
 import io.reactivex.Flowable
 
