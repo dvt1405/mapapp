@@ -73,6 +73,11 @@ class ImageRepository(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ rs ->
+                    rs.photos?.photo?.forEach {
+                        val url =
+                            "https://farm${it.farm}.staticflickr.com/${it.server}/${it.id}_${it.secret}.jpg"
+                        it.url = url
+                    }
                     data.postValue(rs.photos?.photo)
                 }, { err -> err.printStackTrace() }
                 )
@@ -116,9 +121,7 @@ class ImageRepository(
                     it.bitmap = byteArrayImage
                     runBlocking {
                         updateImage(it)
-                        Log.i("url", it.url.plus(" "+it.id))
                     }
-                    Log.i("Download", "Done")
                 }
 
             }, { er ->
@@ -137,6 +140,5 @@ class ImageRepository(
         }
         return images
     }
-
 
 }

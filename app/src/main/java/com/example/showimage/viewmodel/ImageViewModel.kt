@@ -1,11 +1,18 @@
 package com.example.showimage.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
+import com.example.showimage.R
 import com.example.showimage.database.RoomDB
 import com.example.showimage.database.model.Image
 import com.example.showimage.database.model.ImageMarkerModel
@@ -21,13 +28,15 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import retrofit2.http.Url
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.lang.NullPointerException
 import java.net.URL
 import java.util.*
 import java.util.function.LongFunction
 
-class ImageViewModel(application: Application) : AndroidViewModel(application) {
+class ImageViewModel(application: Application) :
+    AndroidViewModel(application) {
     var imageRepository: ImageRepository
     var imageMarkerRepository: ImageMarkerRepository
     var markerRepository: MarkerRepository
@@ -59,8 +68,9 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
                 imageMarkerModel.id_image = items.id
                 imageMarkerRepository.update(imageMarkerModel)
                 imageRepository.insertImage(items)
-                Log.i("Insert", "done")
-            }catch (ex:NullPointerException) {
+                Log.i("update image marker ", "done")
+
+            } catch (ex: NullPointerException) {
                 imageMarkerModel = ImageMarkerModel()
                 var marker: MarkerDBModel = async { markerRepository.getMarker(lat, lon) }.await()
                 imageMarkerModel.id = UUID.randomUUID().toString()
@@ -68,19 +78,13 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
                 imageMarkerModel.id_image = items.id
                 imageMarkerRepository.insert(imageMarkerModel)
                 imageRepository.insertImage(items)
-                Log.i("Insert", "done")
+                Log.i("Insert image marker", "done")
             }
 
         }
     }
 
-
-    fun saveImageFlickr(image: Image) {
-
-    }
-
     fun update(image: Image) = viewModelScope.launch {
-
         imageRepository.updateImage(image)
     }
 
@@ -91,16 +95,13 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         perpage: Int
     ): LiveData<List<Image>> {
         var data: MutableLiveData<List<Image>> = MutableLiveData()
-
         runBlocking {
             val liveData = async { imageRepository.loadImagesNetwork(lat, lon, page, perpage) }
             runBlocking {
                 data = liveData.await() as MutableLiveData<List<Image>>
             }
         }
-        listImage = data
         return data
-
     }
 
     fun loadImageLocal(lat: Double, lon: Double): List<Image> {
@@ -119,7 +120,6 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
 
     fun downloadImage(image: Image) {
         imageRepository.downloadImage(image)
-
     }
 
     fun downloadListImage(images: List<Image>) {
@@ -129,6 +129,26 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     fun delete(image: Image) = viewModelScope.launch {
         imageRepository.deleteImage(image)
         imageMarkerRepository.delete(image)
+    }
+
+    fun loadImageBitmap(arr: ByteArray, imgItem: ImageView) {
+        val arrayInputStream = ByteArrayInputStream(arr)
+        val bitmap = BitmapFactory.decodeStream(arrayInputStream)
+        Glide.with(imgItem.context).load(bitmap).into(imgItem)
+    }
+
+    fun loadImageNetwork(url: String, imgItem: ImageView) {
+        Glide.with(imgItem.context).load(url).into(imgItem)
+    }
+
+    class ViewHolder(row: View?) {
+        var imageView: ImageView? = null
+        var textView: TextView? = null
+
+        init {
+            imageView = row?.findViewById(R.id.imageItem)
+            textView = row?.findViewById(R.id.titleImage)
+        }
     }
 
 }

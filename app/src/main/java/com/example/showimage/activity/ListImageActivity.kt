@@ -1,7 +1,12 @@
 package com.example.showimage.activity
 
+import android.app.ProgressDialog
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.example.showimage.R
 import com.example.showimage.Utils
@@ -25,7 +30,6 @@ class ListImageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_image)
         supportActionBar?.hide()
-
         val intent = intent
         val bundle: Bundle? = intent.extras
         latitude = bundle?.getDouble(Utils.LATITUDE_VALUES)
@@ -51,14 +55,12 @@ class ListImageActivity : AppCompatActivity() {
         imageViewModel.loadImageNetwork(latitude!!, longtitude!!, page, perPage)
             .observe(this, androidx.lifecycle.Observer {
                 if (it.isNotEmpty()) {
-                    it.forEach {
-                        val url =
-                            "https://farm${it.farm}.staticflickr.com/${it.server}/${it.id}_${it.secret}.jpg"
-                        it.url = url
-                    }
                     adapter.pageNume = page
                     imageViewModel.insert(it, latitude!!, longtitude!!)
                     imageViewModel.downloadListImage(it)
+                } else {
+                    Toast.makeText(this,"No image to show",Toast.LENGTH_LONG).show()
+
                 }
                 adapter.listImage = it as ArrayList<Image>
             })

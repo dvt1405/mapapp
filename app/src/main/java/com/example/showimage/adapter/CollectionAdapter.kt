@@ -50,23 +50,8 @@ class CollectionAdapter(
             view = convertView
             viewHolder = view.tag as ViewHolder
         }
-        if (this.listImageData.isNotEmpty()) {
-            Log.i("size", listImageData.size.toString())
-            try {
-                val items = this.listImageData.get(position)
-                viewHolder.textView!!.text = items.title
-                if (items.bitmap != null) {
-                    Log.i("bitmap", "load done")
-                    loadImageBitmap(items.bitmap!!, viewHolder.imageView!!)
-                } else if (items.url!!.isNotEmpty()) {
-                    loadImageNetwork(items.url.toString(), viewHolder.imageView!!)
-                }
-            } catch (err: Exception) {
-                err.printStackTrace()
-            }
-        } else {
-            Toast.makeText(context, "No image to show", Toast.LENGTH_LONG).show()
-        }
+        loadImage(listImage[position],viewHolder.textView!!,viewHolder.imageView!!)
+
         return view
     }
 
@@ -75,6 +60,7 @@ class CollectionAdapter(
     override fun getItemId(position: Int): Long = this.listImageData!!.get(position).id!!.toLong()
 
     override fun getCount(): Int = this.listImageData!!.size
+
     fun loadImageBitmap(arr: ByteArray, view: ImageView) {
         val arrayInputStream = ByteArrayInputStream(arr)
         val bitmap = BitmapFactory.decodeStream(arrayInputStream)
@@ -83,6 +69,25 @@ class CollectionAdapter(
 
     fun loadImageNetwork(url: String, imgItem: ImageView) {
         Glide.with(context).load(url).into(imgItem)
+    }
+
+    fun loadImage(items:Image,textView:TextView,imageView:ImageView) {
+        if (this.listImageData.isNotEmpty()) {
+            Log.i("size", listImageData.size.toString())
+            try {
+                textView.text = items.title
+                if (items.bitmap != null) {
+                    Log.i("bitmap", "load done")
+                    loadImageBitmap(items.bitmap!!, imageView)
+                } else if (items.url!!.isNotEmpty()) {
+                    loadImageNetwork(items.url.toString(), imageView)
+                }
+            } catch (err: Exception) {
+                err.printStackTrace()
+            }
+        } else {
+            Toast.makeText(context, "No image to show", Toast.LENGTH_LONG).show()
+        }
     }
 
     class ViewHolder(row: View?) {

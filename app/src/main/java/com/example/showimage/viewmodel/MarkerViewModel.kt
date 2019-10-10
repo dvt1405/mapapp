@@ -1,6 +1,7 @@
 package com.example.showimage.viewmodel
 
 import android.app.Application
+import android.location.Address
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -38,14 +39,19 @@ class MarkerViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun insertMarkerOption(marker: MarkerOptions) {
+    fun insertMarkerOption(marker: MarkerOptions, address:List<Address>) {
         var markerDBModel = MarkerDBModel()
         markerDBModel.lat = marker.position.latitude.toString()
         markerDBModel.lon = marker.position.longitude.toString()
         markerDBModel.isOldMarker = true
+
+        if(address.isNotEmpty()) {
+            markerDBModel.city = address.get(0).getAddressLine(0)
+        }
         viewModelScope.launch {
             markerRepository.insertMarker(markerDBModel)
         }
+
     }
 
     fun insert(listMarkerDBModel: MarkerDBModel){
@@ -80,6 +86,7 @@ class MarkerViewModel(application: Application) : AndroidViewModel(application) 
         }
         return marker
     }
+
 
 
 }

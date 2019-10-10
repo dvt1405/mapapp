@@ -1,5 +1,7 @@
 package com.example.showimage.database.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -43,5 +45,7 @@ class Image {
     var bitmap: ByteArray? = null
     @ColumnInfo(name = "url")
     var url: String? = ""
+
+
 
 }
