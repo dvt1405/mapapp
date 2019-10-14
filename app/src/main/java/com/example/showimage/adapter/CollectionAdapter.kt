@@ -1,7 +1,6 @@
 package com.example.showimage.adapter
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,24 +10,23 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.showimage.R
-import com.example.showimage.database.model.Image
+import com.example.showimage.database.model.ImageModel
 import java.io.ByteArrayInputStream
 import java.lang.Exception
 
 
 class CollectionAdapter(
     private var context: Context,
-    private var listImageData: ArrayList<Image> = arrayListOf(),
+    private var listImageModelData: ArrayList<ImageModel> = arrayListOf(),
     private var page: Int
 ) : BaseAdapter() {
 
     var listImage
-        get() = listImageData
+        get() = listImageModelData
         set(value) {
-            this.listImageData.addAll(value)
+            this.listImageModelData.addAll(value)
             notifyDataSetChanged()
         }
     var pageNume
@@ -55,11 +53,11 @@ class CollectionAdapter(
         return view
     }
 
-    override fun getItem(position: Int): Any = this.listImageData!!.get(position)
+    override fun getItem(position: Int): Any = this.listImageModelData!!.get(position)
 
-    override fun getItemId(position: Int): Long = this.listImageData!!.get(position).id!!.toLong()
+    override fun getItemId(position: Int): Long = this.listImageModelData!!.get(position).id!!.toLong()
 
-    override fun getCount(): Int = this.listImageData!!.size
+    override fun getCount(): Int = this.listImageModelData!!.size
 
     fun loadImageBitmap(arr: ByteArray, view: ImageView) {
         val arrayInputStream = ByteArrayInputStream(arr)
@@ -71,9 +69,9 @@ class CollectionAdapter(
         Glide.with(context).load(url).into(imgItem)
     }
 
-    fun loadImage(items:Image,textView:TextView,imageView:ImageView) {
-        if (this.listImageData.isNotEmpty()) {
-            Log.i("size", listImageData.size.toString())
+    fun loadImage(items:ImageModel, textView:TextView, imageView:ImageView) {
+        if (this.listImageModelData.isNotEmpty()) {
+            Log.i("size", listImageModelData.size.toString())
             try {
                 textView.text = items.title
                 if (items.bitmap != null) {

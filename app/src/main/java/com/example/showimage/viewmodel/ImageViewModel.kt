@@ -1,50 +1,37 @@
 package com.example.showimage.viewmodel
 
 import android.app.Application
-import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.showimage.R
 import com.example.showimage.database.RoomDB
-import com.example.showimage.database.model.Image
+import com.example.showimage.database.model.ImageModel
 import com.example.showimage.database.model.ImageMarkerModel
-import com.example.showimage.database.model.ListImageResponse
 import com.example.showimage.database.model.MarkerDBModel
 import com.example.showimage.repository.ImageMarkerRepository
 import com.example.showimage.repository.ImageRepository
 import com.example.showimage.repository.MarkerRepository
-import com.google.android.gms.maps.model.Marker
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import retrofit2.http.Url
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.lang.NullPointerException
-import java.net.URL
 import java.util.*
-import java.util.function.LongFunction
 
 class ImageViewModel(application: Application) :
     AndroidViewModel(application) {
     var imageRepository: ImageRepository
     var imageMarkerRepository: ImageMarkerRepository
     var markerRepository: MarkerRepository
-    var listImage: MutableLiveData<List<Image>>? = MutableLiveData()
+    var listImageModel: MutableLiveData<List<ImageModel>>? = MutableLiveData()
 
     init {
         val roomDB: RoomDB = RoomDB.getDatabase(application, viewModelScope)
-        val imageDao = roomDB.imageDAO()
+        val imageDao = roomDB.ImageDAO()
         val imageMarkerDAO = roomDB.ImageMarkerDAO()
         val markerDAO = roomDB.MarkerDAO()
         imageMarkerRepository = ImageMarkerRepository(imageMarkerDAO)
@@ -53,13 +40,13 @@ class ImageViewModel(application: Application) :
         markerRepository = MarkerRepository(markerDAO)
     }
 
-    fun insert(image: Image) = viewModelScope.launch {
-        imageRepository.insertImage(image)
+    fun insert(imageModel: ImageModel) = viewModelScope.launch {
+        imageRepository.insertImage(imageModel)
 
     }
 
-    fun insert(images: List<Image>, lat: Double, lon: Double) = viewModelScope.launch {
-        for (items in images) {
+    fun insert(imageModels: List<ImageModel>, lat: Double, lon: Double) = viewModelScope.launch {
+        for (items in imageModels) {
             Log.i("ID image", items.id)
             var imageMarkerModel = imageMarkerRepository.getImageMarker(items)
             try {
@@ -84,8 +71,8 @@ class ImageViewModel(application: Application) :
         }
     }
 
-    fun update(image: Image) = viewModelScope.launch {
-        imageRepository.updateImage(image)
+    fun update(imageModel: ImageModel) = viewModelScope.launch {
+        imageRepository.updateImage(imageModel)
     }
 
     fun loadImageNetwork(
@@ -93,19 +80,19 @@ class ImageViewModel(application: Application) :
         lon: Double,
         page: Int,
         perpage: Int
-    ): LiveData<List<Image>> {
-        var data: MutableLiveData<List<Image>> = MutableLiveData()
+    ): LiveData<List<ImageModel>> {
+        var data: MutableLiveData<List<ImageModel>> = MutableLiveData()
         runBlocking {
             val liveData = async { imageRepository.loadImagesNetwork(lat, lon, page, perpage) }
             runBlocking {
-                data = liveData.await() as MutableLiveData<List<Image>>
+                data = liveData.await() as MutableLiveData<List<ImageModel>>
             }
         }
         return data
     }
 
-    fun loadImageLocal(lat: Double, lon: Double): List<Image> {
-        var data: List<Image> = listOf()
+    fun loadImageLocal(lat: Double, lon: Double): List<ImageModel> {
+        var data: List<ImageModel> = listOf()
         runBlocking {
             val marker: MarkerDBModel = markerRepository.getMarker(lat, lon)
             val listImageMarker = imageMarkerRepository.getListImageMarkerByIDMarker(marker)
@@ -118,37 +105,19 @@ class ImageViewModel(application: Application) :
         return data
     }
 
-    fun downloadImage(image: Image) {
-        imageRepository.downloadImage(image)
+    fun downloadImage(imageModel: ImageModel) {
+        imageRepository.downloadImage(imageModel)
     }
 
-    fun downloadListImage(images: List<Image>) {
-        imageRepository.downloadImage(images)
+    fun downloadListImage(imageModels: List<ImageModel>) {
+            imageRepository.downloadImage(imageModels)
+
     }
 
-    fun delete(image: Image) = viewModelScope.launch {
-        imageRepository.deleteImage(image)
-        imageMarkerRepository.delete(image)
+    fun delete(imageModel: ImageModel) = viewModelScope.launch {
+        imageRepository.deleteImage(imageModel)
+        imageMarkerRepository.delete(imageModel)
     }
 
-    fun loadImageBitmap(arr: ByteArray, imgItem: ImageView) {
-        val arrayInputStream = ByteArrayInputStream(arr)
-        val bitmap = BitmapFactory.decodeStream(arrayInputStream)
-        Glide.with(imgItem.context).load(bitmap).into(imgItem)
-    }
-
-    fun loadImageNetwork(url: String, imgItem: ImageView) {
-        Glide.with(imgItem.context).load(url).into(imgItem)
-    }
-
-    class ViewHolder(row: View?) {
-        var imageView: ImageView? = null
-        var textView: TextView? = null
-
-        init {
-            imageView = row?.findViewById(R.id.imageItem)
-            textView = row?.findViewById(R.id.titleImage)
-        }
-    }
 
 }

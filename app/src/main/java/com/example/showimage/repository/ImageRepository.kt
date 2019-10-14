@@ -1,38 +1,29 @@
 package com.example.showimage.repository
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.AsyncTask
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.bumptech.glide.Glide
 import com.example.showimage.database.dao.ImageDAO
 import com.example.showimage.database.dao.ImageMarkerDAO
 import com.example.showimage.database.dao.MarkerDAO
-import com.example.showimage.database.model.Image
+import com.example.showimage.database.model.ImageModel
 import com.example.showimage.database.model.ImageMarkerModel
 import com.example.showimage.database.model.ListImageResponse
-import com.example.showimage.database.model.MarkerDBModel
+import com.example.showimage.domain.data.datasource.LocalImageDataSource
+import com.example.showimage.domain.data.datasource.NetworkImageDataSource
+import com.example.showimage.domain.domain.MarkerCore
 import com.example.showimage.network.ApiCall
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody
 import retrofit2.Call
-import retrofit2.http.Url
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 import java.net.URL
-import java.security.AccessControlContext
-import javax.security.auth.callback.Callback
 import retrofit2.Response
-import java.lang.Exception
 
 
 class ImageRepository(
@@ -42,27 +33,27 @@ class ImageRepository(
 ) {
     var imageFromApi: ListImageResponse? = null
 
-    suspend fun getImages(): List<Image> = imageDAO.getImage()
+    suspend fun getImages(markerCore: MarkerCore): List<ImageModel> = imageDAO.getImage()
 
-    suspend fun getImage(id: String): Image = imageDAO.getImage(id)
+    suspend fun getImage(id: String): ImageModel = imageDAO.getImage(id)
 
-    suspend fun insertImage(image: Image) = this.imageDAO.inserImage(image)
+    suspend fun insertImage(imageModel: ImageModel) = this.imageDAO.inserImage(imageModel)
 
-    suspend fun insertImage(images: List<Image>) = this.imageDAO.inserImage(images)
+    suspend fun insertImage(imageModels: List<ImageModel>) = this.imageDAO.inserImage(imageModels)
 
-    suspend fun deleteImage(image: Image) = imageDAO.deleteImage(image)
+    suspend fun deleteImage(imageModel: ImageModel) = imageDAO.deleteImage(imageModel)
 
-    suspend fun deleteImage(images: List<Image>) = imageDAO.deleteImage(images)
+    suspend fun deleteImage(imageModels: List<ImageModel>) = imageDAO.deleteImage(imageModels)
 
-    suspend fun updateImage(image: Image) = imageDAO.updateImage(image)
+    suspend fun updateImage(imageModel: ImageModel) = imageDAO.updateImage(imageModel)
 
     fun loadImagesNetwork(
         lat: Double,
         lon: Double,
         page: Int,
         perpage: Int
-    ): LiveData<List<Image>> {
-        var data: MutableLiveData<List<Image>> = MutableLiveData()
+    ): LiveData<List<ImageModel>> {
+        var data: MutableLiveData<List<ImageModel>> = MutableLiveData()
         try {
             ApiCall().requestSearchImageForLocation(
                 lat.toString(),
@@ -87,9 +78,9 @@ class ImageRepository(
         return data
     }
 
-    fun downloadImage(image: Image): Image {
+    fun downloadImage(imageModel: ImageModel): ImageModel {
         val url =
-            "https://farm${image.farm}.staticflickr.com/${image.server}/${image.id}_${image.secret}.jpg"
+            "https://farm${imageModel.farm}.staticflickr.com/${imageModel.server}/${imageModel.id}_${imageModel.secret}.jpg"
         ApiCall().downloadImage(url).enqueue(object : retrofit2.Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response == null || !response.isSuccessful || response.body() == null || response.errorBody() != null) {
@@ -102,12 +93,11 @@ class ImageRepository(
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
             }
         })
-        return image
+        return imageModel
     }
 
-    fun downloadImage(images: List<Image>) {
-
-        Observable.just(images)
+     fun downloadImage(imageModels: List<ImageModel>) {
+        Observable.just(imageModels)
             .subscribeOn(Schedulers.io())
             .subscribe({ rs ->
                 rs.forEach {
@@ -130,12 +120,12 @@ class ImageRepository(
 
     }
 
-    fun loadImageLocal(listMarkerImage: List<ImageMarkerModel>): List<Image> {
-        var images = arrayListOf<Image>()
+    fun loadImageLocal(listMarkerImage: List<ImageMarkerModel>): List<ImageModel> {
+        var images = arrayListOf<ImageModel>()
         for (i in listMarkerImage) {
             runBlocking {
-                var image: Image = getImage(i.id_image!!)
-                images.add(image)
+                var imageModel: ImageModel = getImage(i.id_image!!)
+                images.add(imageModel)
             }
         }
         return images

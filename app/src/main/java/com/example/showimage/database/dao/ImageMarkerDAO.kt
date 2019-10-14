@@ -1,8 +1,6 @@
 package com.example.showimage.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.showimage.database.model.Image
 import com.example.showimage.database.model.ImageMarkerModel
 
 @Dao

@@ -1,15 +1,14 @@
 package com.example.showimage.database.model
 
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.showimage.domain.domain.MarkerCore
 import java.util.*
 
 @Entity(tableName = "marker")
-class MarkerDBModel() : Parcelable {
+class MarkerDBModel() {
     @PrimaryKey
     @NonNull
     var id: String? = UUID.randomUUID().toString()
@@ -26,37 +25,25 @@ class MarkerDBModel() : Parcelable {
     @ColumnInfo(name = "country")
     var country: String? = ""
 
-    constructor(parcel: Parcel) : this() {
-        id = parcel.readString()
-        lat = parcel.readString()
-        lon = parcel.readString()
-        isOldMarker = parcel.readValue(Boolean::class.java.classLoader) as? Boolean
-        title = parcel.readString()
-        city = parcel.readString()
-        country = parcel.readString()
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(id)
-        parcel.writeString(lat)
-        parcel.writeString(lon)
-        parcel.writeValue(isOldMarker)
-        parcel.writeString(title)
-        parcel.writeString(city)
-        parcel.writeString(country)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<MarkerDBModel> {
-        override fun createFromParcel(parcel: Parcel): MarkerDBModel {
-            return MarkerDBModel(parcel)
+    companion object{
+        fun toMarkerCore(markerDBModel: MarkerDBModel): MarkerCore {
+            return MarkerCore(markerDBModel.id!!,
+                markerDBModel.lat!!,
+                markerDBModel.lon!!,
+                markerDBModel.isOldMarker,
+                markerDBModel.title,
+                markerDBModel.city)
         }
-
-        override fun newArray(size: Int): Array<MarkerDBModel?> {
-            return arrayOfNulls(size)
+        fun fromMarkerCore(markerCore: MarkerCore): MarkerDBModel{
+            var markerDBModel = MarkerDBModel()
+            markerDBModel.id = markerCore.id
+            markerDBModel.lat = markerCore.latitude
+            markerDBModel.lon = markerCore.lontitide
+            markerDBModel.isOldMarker = markerCore.old
+            markerDBModel.title = markerCore.title
+            markerDBModel.city = markerCore.city
+            return markerDBModel
         }
     }
+
 }

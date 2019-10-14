@@ -34,5 +34,4 @@ interface MarkerDAO {
     @Query("DELETE FROM MARKER WHERE marker.latitude = :lat AND marker.longitude = :lon")
     suspend fun delete(lat:String, lon:String)
 
-
 }

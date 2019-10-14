@@ -18,4 +18,5 @@ class ImageMarkerModel{
     @ColumnInfo(name = "idimage")
     var id_image: String? = ""
 
+
 }

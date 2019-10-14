@@ -1,29 +1,31 @@
 package com.example.showimage.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.showimage.database.model.Image
+import com.example.showimage.database.model.ImageModel
 
 @Dao
 interface ImageDAO {
     @Query("SELECT * FROM IMAGE WHERE id = :id")
-    suspend fun getImage(id: String): Image
+    suspend fun getImage(id: String): ImageModel
 
     @Query("SELECT * FROM IMAGE")
-    suspend fun getImage(): List<Image>
+    suspend fun getImage(): List<ImageModel>
+
+    @Query("SELECT image.* FROM image, image_marker WHERE image_marker.idmarker = :idMarker AND image.id = image_marker.idimage ")
+    suspend fun getImages(idMarker: String): List<ImageModel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserImage(image: Image)
+    suspend fun inserImage(imageModel: ImageModel)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserImage(imageList: List<Image>)
+    suspend fun inserImage(imageModelList: List<ImageModel>)
 
     @Update
-    suspend fun updateImage(image: Image)
+    suspend fun updateImage(imageModel: ImageModel)
 
     @Delete
-    suspend fun deleteImage(image: Image)
+    suspend fun deleteImage(imageModel: ImageModel)
 
     @Delete
-    suspend fun deleteImage(images: List<Image>)
+    suspend fun deleteImage(imageModels: List<ImageModel>)
 }

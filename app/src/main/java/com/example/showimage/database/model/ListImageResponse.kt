@@ -16,7 +16,7 @@ class ListImageResponse {
         @SerializedName("total")
         var total:String?=""
         @SerializedName("photo")
-        var photo:List<Image>?=null
+        var photo:List<ImageModel>?=null
     }
 
 }
